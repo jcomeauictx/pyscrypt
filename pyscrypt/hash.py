@@ -21,12 +21,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+# modifications copyright (C) 2021 jc@unternet.net
 
 import hashlib
 import hmac
 import struct
 import logging
-from binascii import hexlify
+from binascii import hexlify, unhexlify
 
 logging.basicConfig(level=logging.DEBUG if __debug__ else logging.WARN)
 
@@ -263,4 +264,15 @@ def hash(password, salt, N, r, p, dkLen):
     return pbkdf2_single(password, chars_to_bytes(Bc), dkLen, prf)
 
 if __name__ == '__main__':
-    print(hexlify(hash('', '', 16, 1, 1, 64)))
+    ROMIX_TEST_VECTOR = unhexlify(''.join(
+        'f7 ce 0b 65 3d 2d 72 a4 10 8c f5 ab e9 12 ff dd'
+        '77 76 16 db bb 27 a7 0e 82 04 f3 ae 2d 0f 6f ad'
+        '89 f6 8f 48 11 d1 e8 7b cc 3b d7 40 0a 9f fd 29'
+        '09 4f 01 84 63 95 74 f3 9a e5 a1 31 52 17 bc d7'
+        '89 49 91 44 72 13 bb 22 6c 25 b5 4d a8 63 70 fb'
+        'cd 98 43 80 37 46 66 bb 8f fc b5 bf 40 c2 54 b0'
+        '67 d2 7c 51 ce 4a d5 fe d8 29 c9 0b 50 5a 57 1b'
+        '7f 4d 1c ad 6a 52 3c da 77 0e 67 bc ea af 7e 89'
+    .split()))
+    #print('smix:', smix(ROMIX_TEST_VECTOR, 0, 1, 16, [0] * 32 * 16, [0] * 64))
+    print('hash:', hexlify(hash('', '', 16, 1, 1, 64)))
