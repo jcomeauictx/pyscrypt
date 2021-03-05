@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # The MIT License (MIT)
 #
 # Copyright (c) 2014 Richard Moore
@@ -24,6 +25,10 @@
 import hashlib
 import hmac
 import struct
+import logging
+from binascii import hexlify
+
+logging.basicConfig(level=logging.DEBUG if __debug__ else logging.WARN)
 
 
 # Python 2
@@ -202,7 +207,7 @@ def smix(B, Bi, r, N, V, X):
         aod = i * 32 * r                             # ROMix - 3
         V[aod:aod + 32 * r] = X[:32 * r]
         blockmix_salsa8(X, 32 * r, r)                # ROMix - 4
-
+    logging.debug('V: %s', V)
     for i in xrange(0, N):                           # ROMix - 6
         j = X[(2 * r - 1) * 16] & (N - 1)            # ROMix - 7
         for xi in xrange(0, 32 * r):                 # ROMix - 8(inner)
@@ -256,3 +261,6 @@ def hash(password, salt, N, r, p, dkLen):
         Bc.append((i >> 24) & 0xff)
 
     return pbkdf2_single(password, chars_to_bytes(Bc), dkLen, prf)
+
+if __name__ == '__main__':
+    print(hexlify(hash('', '', 16, 1, 1, 64)))
