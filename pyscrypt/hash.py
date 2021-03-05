@@ -248,7 +248,7 @@ def hash(password, salt, N, r, p, dkLen):
     b = struct.unpack('<%dL' % ((p * 128 * r) / 4), pbkdf2_single(
         password, salt, p * 128 * r, prf))
     B = [ ((B[i + 3] << 24) | (B[i + 2] << 16) | (B[i + 1] << 8) | B[i + 0]) for i in xrange(0, len(B), 4)]
-    logging.debug('checking if %s == %s', b, B)
+    #logging.debug('checking if %s == %s', b, B)
     assert b == tuple(B)
 
     XY = [ 0 ] * (64 * r)
@@ -264,6 +264,9 @@ def hash(password, salt, N, r, p, dkLen):
         Bc.append((i >> 8) & 0xff)
         Bc.append((i >> 16) & 0xff)
         Bc.append((i >> 24) & 0xff)
+    bc = struct.pack('<%dL' % (len(B)), *B)
+    logging.debug('checking if %s == %s', bc, Bc)
+    assert bc == chars_to_bytes(Bc)
 
     return pbkdf2_single(password, chars_to_bytes(Bc), dkLen, prf)
 
