@@ -23,6 +23,7 @@
 
 # modifications copyright (C) 2021 jc@unternet.net
 
+from __future__ import print_function
 import hashlib
 import hmac
 import struct
@@ -244,12 +245,8 @@ def hash(password, salt, N, r, p, dkLen):
     prf = lambda k, m: hmac.new(key = k, msg = m, digestmod = hashlib.sha256).digest()
 
     # convert into integers
-    B  = [ get_byte(c) for c in pbkdf2_single(password, salt, p * 128 * r, prf) ]
-    b = struct.unpack('<%dL' % ((p * 128 * r) / 4), pbkdf2_single(
-        password, salt, p * 128 * r, prf))
-    B = [ ((B[i + 3] << 24) | (B[i + 2] << 16) | (B[i + 1] << 8) | B[i + 0]) for i in xrange(0, len(B), 4)]
-    #logging.debug('checking if %s == %s', b, B)
-    assert b == tuple(B)
+    B = list(struct.unpack('<%dL' % ((p * 128 * r) // 4), pbkdf2_single(
+             password, salt, p * 128 * r, prf)))
 
     XY = [ 0 ] * (64 * r)
     V  = [ 0 ] * (32 * r * N)
@@ -258,17 +255,9 @@ def hash(password, salt, N, r, p, dkLen):
         smix(B, i * 32 * r, r, N, V, XY)
 
     # Convert back into bytes
-    Bc = [ ]
-    for i in B:
-        Bc.append((i >> 0) & 0xff)
-        Bc.append((i >> 8) & 0xff)
-        Bc.append((i >> 16) & 0xff)
-        Bc.append((i >> 24) & 0xff)
-    bc = struct.pack('<%dL' % (len(B)), *B)
-    logging.debug('checking if %r == %s', bc, Bc)
-    assert bc == chars_to_bytes(Bc)
+    Bc = struct.pack('<%dL' % (len(B)), *B)
 
-    return pbkdf2_single(password, chars_to_bytes(Bc), dkLen, prf)
+    return pbkdf2_single(password, Bc, dkLen, prf)
 
 if __name__ == '__main__':
     ROMIX_TEST_VECTOR = unhexlify(''.join(
