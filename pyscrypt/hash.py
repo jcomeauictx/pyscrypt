@@ -245,7 +245,11 @@ def hash(password, salt, N, r, p, dkLen):
 
     # convert into integers
     B  = [ get_byte(c) for c in pbkdf2_single(password, salt, p * 128 * r, prf) ]
+    b = struct.unpack('<%dL' % ((p * 128 * r) / 4), pbkdf2_single(
+        password, salt, p * 128 * r, prf))
     B = [ ((B[i + 3] << 24) | (B[i + 2] << 16) | (B[i + 1] << 8) | B[i + 0]) for i in xrange(0, len(B), 4)]
+    logging.debug('checking if %s == %s', b, B)
+    assert b == tuple(B)
 
     XY = [ 0 ] * (64 * r)
     V  = [ 0 ] * (32 * r * N)
@@ -275,4 +279,4 @@ if __name__ == '__main__':
         '7f 4d 1c ad 6a 52 3c da 77 0e 67 bc ea af 7e 89'
     .split()))
     #print('smix:', smix(ROMIX_TEST_VECTOR, 0, 1, 16, [0] * 32 * 16, [0] * 64))
-    print('hash:', hexlify(hash('', '', 16, 1, 1, 64)))
+    print('hash:', hexlify(hash(b'', b'', 16, 1, 1, 64)))
