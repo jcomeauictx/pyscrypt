@@ -200,16 +200,21 @@ def blockmix_salsa8(BY, Yi, r):
         BY[aod:aod + 16] = BY[aos:aos + 16]
 
 
-def smix(B, Bi, r, N, V, X):
-    '''SMix; a specific case of ROMix. See scrypt.pdf in the links above.'''
+def smix(B, Bi, r, N):
+    '''
+    SMix; a specific case of ROMix. See scrypt.pdf in the links above.
+    '''
 
+    X = [ 0 ] * (64 * r)
+    V = [ 0 ] * (32 * r * N)
     X[:32 * r] = B[Bi:Bi + 32 * r]                   # ROMix - 1
 
     for i in xrange(0, N):                           # ROMix - 2
         aod = i * 32 * r                             # ROMix - 3
         V[aod:aod + 32 * r] = X[:32 * r]
         blockmix_salsa8(X, 32 * r, r)                # ROMix - 4
-    logging.debug('V: %s', map(hex, V))
+    logging.debug('V: %s', list(map(hex, V)))
+    logging.debug('V: %r', struct.pack('<%dL' % (len(V)), *V))
     for i in xrange(0, N):                           # ROMix - 6
         j = X[(2 * r - 1) * 16] & (N - 1)            # ROMix - 7
         for xi in xrange(0, 32 * r):                 # ROMix - 8(inner)
@@ -248,11 +253,8 @@ def hash(password, salt, N, r, p, dkLen):
     B = list(struct.unpack('<%dL' % ((p * 128 * r) // 4), pbkdf2_single(
              password, salt, p * 128 * r, prf)))
 
-    XY = [ 0 ] * (64 * r)
-    V  = [ 0 ] * (32 * r * N)
-
     for i in xrange(0, p):
-        smix(B, i * 32 * r, r, N, V, XY)
+        smix(B, i * 32 * r, r, N)
 
     # Convert back into bytes
     Bc = struct.pack('<%dL' % (len(B)), *B)
