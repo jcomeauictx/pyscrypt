@@ -207,7 +207,7 @@ def smix(B, Bi, r, N, V, X):
         aod = i * 32 * r                             # ROMix - 3
         V[aod:aod + 32 * r] = X[:32 * r]
         blockmix_salsa8(X, 32 * r, r)                # ROMix - 4
-    logging.debug('V: %s', V)
+    logging.debug('V: %s', map(hex, V))
     for i in xrange(0, N):                           # ROMix - 6
         j = X[(2 * r - 1) * 16] & (N - 1)            # ROMix - 7
         for xi in xrange(0, 32 * r):                 # ROMix - 8(inner)
