@@ -265,7 +265,7 @@ def hash(password, salt, N, r, p, dkLen):
         Bc.append((i >> 16) & 0xff)
         Bc.append((i >> 24) & 0xff)
     bc = struct.pack('<%dL' % (len(B)), *B)
-    logging.debug('checking if %s == %s', bc, Bc)
+    logging.debug('checking if %r == %s', bc, Bc)
     assert bc == chars_to_bytes(Bc)
 
     return pbkdf2_single(password, chars_to_bytes(Bc), dkLen, prf)
