@@ -213,11 +213,11 @@ def smix(B, Bi, r, N):
         aod = i * 32 * r                             # ROMix - 3
         V[aod:aod + 32 * r] = X[:32 * r]
         blockmix_salsa8(X, 32 * r, r)                # ROMix - 4
-    logging.debug('V: %r', struct.pack('<%dL' % (len(V)), *V))
+    #logging.debug('V: %r', struct.pack('<%dL' % (len(V)), *V))
     for i in xrange(0, N):                           # ROMix - 6
-        logging.debug('X: %r', struct.pack('<%dL' % (len(X)), *X))
+        #logging.debug('X: %r', struct.pack('<%dL' % (len(X)), *X))
         j = X[(2 * r - 1) * 16] & (N - 1)            # ROMix - 7
-        logging.debug('Integerify(X): 0x%x, j: %d', X[(2 * r - 1) * 16], j)
+        #logging.debug('Integerify(X): 0x%x, j: %d', X[(2 * r - 1) * 16], j)
         for xi in xrange(0, 32 * r):                 # ROMix - 8(inner)
             X[xi] ^= V[j * 32 * r + xi]
 
