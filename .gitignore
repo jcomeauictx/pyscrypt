@@ -1,3 +1,4 @@
 build/*
 dist/*
 pyscrypt/*.pyc
+__pycache__
